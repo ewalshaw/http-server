@@ -3,6 +3,7 @@
 #include "router.hpp"
 #include "server.hpp"
 
+#include <chrono>
 #include <ctime>
 #include <iostream>
 #include <stdexcept>
@@ -35,6 +36,9 @@ void handle_client(Client& client, const Router& router) {
 }  // namespace
 
 int main() {
+    constexpr int port = 8080;
+    const auto started = std::chrono::steady_clock::now();
+
     Router router;
     router.get("/", [](const Request&) {
         Response response;
@@ -51,6 +55,15 @@ int main() {
             "|_| |_|\\___|_|_|\\___/     \\_/\\_/ \\___/|_|  |_|\\__,_(_)\n";
         return response;
     });
+    router.get("/health", [started, port](const Request&) {
+        const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(
+                                 std::chrono::steady_clock::now() - started)
+                                 .count();
+        Response response;
+        response.body = "status: ok\nport: " + std::to_string(port) +
+                        "\nuptime_seconds: " + std::to_string(seconds) + "\n";
+        return response;
+    });
     router.get("/time", [](const Request&) {
         const std::time_t now = std::time(nullptr);
         const char* text = std::ctime(&now);
@@ -63,8 +76,8 @@ int main() {
     });
 
     try {
-        Server server(8080);
-        std::cerr << "listening on port 8080\n";
+        Server server(port);
+        std::cerr << "listening on port " << port << "\n";
         for (;;) {
             Client client = server.accept_client();
             try {

@@ -66,12 +66,14 @@ jobs:
           fi
 
           home=$(curl -fsS http://127.0.0.1:8080/)
+          hello=$(curl -fsS http://127.0.0.1:8080/hello-world)
           health=$(curl -fsS http://127.0.0.1:8080/health)
           server_time=$(curl -fsS http://127.0.0.1:8080/time)
           missing=$(curl -sS -o /dev/null -w '%{http_code}' \
             http://127.0.0.1:8080/missing)
 
           [[ "$home" == *"Hello from C++ HTTP server"* ]]
+          [[ "$hello" == *"| | | | ___| | | ___"* ]]
           [[ "$health" == *"status: ok"* ]]
           [[ -n "$server_time" ]]
           [[ "$missing" == "404" ]]

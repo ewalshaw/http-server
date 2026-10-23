@@ -1,10 +1,11 @@
 # C++ HTTP server
 
-A C++ program that opens a TCP port and answers HTTP requests. The pages are /, /time, and /hello-world.
+A C++ program that opens a TCP port and answers HTTP requests. The pages are /, /time, /hello-world, and /health.
 
 - `http://localhost:8080/` replies `Hello from C++ HTTP server`
 - `http://localhost:8080/time` replies with this computer's current time
 - `http://localhost:8080/hello-world` replies with ASCII art that says hello world
+- `http://localhost:8080/health` replies with status, port, and uptime in seconds
 - Any other path replies `404 Not Found`
 
 ## Requirements
@@ -36,6 +37,7 @@ Open a second terminal and run:
 curl http://localhost:8080/
 curl http://localhost:8080/time
 curl http://localhost:8080/hello-world
+curl http://localhost:8080/health
 curl http://localhost:8080/anything-else
 ```
 
@@ -45,6 +47,9 @@ curl http://localhost:8080/anything-else
 Hello from C++ HTTP server
 (Current Date and Time)
 (hello world ASCII art)
+status: ok
+port: 8080
+uptime_seconds: (seconds since start)
 Not Found
 ```
 

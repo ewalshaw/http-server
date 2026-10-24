@@ -47,7 +47,7 @@ jobs:
           ready=false
 
           for _ in 1 2 3 4 5 6 7 8 9 10; do
-            if curl -fsS http://127.0.0.1:8080/health >/dev/null 2>&1; then
+            if curl -fsS "http://127.0.0.1:8080/health" >/dev/null 2>&1; then
               ready=true
               break
             fi
@@ -65,15 +65,20 @@ jobs:
             exit 1
           fi
 
-          home=$(curl -fsS http://127.0.0.1:8080/)
-          hello=$(curl -fsS http://127.0.0.1:8080/hello-world)
-          health=$(curl -fsS http://127.0.0.1:8080/health)
-          server_time=$(curl -fsS http://127.0.0.1:8080/time)
+          home=$(curl -fsS "http://127.0.0.1:8080/")
+          hello=$(curl -fsS "http://127.0.0.1:8080/hello-world")
+          health=$(curl -fsS "http://127.0.0.1:8080/health")
+          server_time=$(curl -fsS "http://127.0.0.1:8080/time")
+          time_query=$(curl -fsS "http://127.0.0.1:8080/time?x=1")
           missing=$(curl -sS -o /dev/null -w '%{http_code}' \
-            http://127.0.0.1:8080/missing)
+            "http://127.0.0.1:8080/missing")
+          missing_query=$(curl -sS -o /dev/null -w '%{http_code}' \
+            "http://127.0.0.1:8080/missing?x=1")
 
           [[ "$home" == *"Hello from C++ HTTP server"* ]]
           [[ "$hello" == *"| | | | ___| | | ___"* ]]
           [[ "$health" == *"status: ok"* ]]
           [[ -n "$server_time" ]]
+          [[ -n "$time_query" ]]
           [[ "$missing" == "404" ]]
+          [[ "$missing_query" == "404" ]]

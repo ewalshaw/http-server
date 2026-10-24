@@ -56,6 +56,12 @@ Request parse_request(const std::string& raw) {
         throw std::runtime_error("bad request line");
     }
 
+    const auto query_pos = request.path.find('?');
+    if (query_pos != std::string::npos) {
+        request.query = request.path.substr(query_pos + 1);
+        request.path.resize(query_pos);
+    }
+
     while (std::getline(lines, line)) {
         line = trim(strip_cr(line));
         if (line.empty()) {

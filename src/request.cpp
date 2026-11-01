@@ -3,6 +3,8 @@
 #include <cctype>
 #include <sstream>
 #include <stdexcept>
+#include <utility>
+#include <vector>
 
 namespace {
 
@@ -34,6 +36,29 @@ std::string strip_cr(std::string line) {
     return line;
 }
 
+std::vector<std::pair<std::string, std::string>> split_query(const std::string& query) {
+    std::vector<std::pair<std::string, std::string>> params;
+    std::size_t start = 0;
+    while (start < query.size()) {
+        const auto amp = query.find('&', start);
+        const auto end = amp == std::string::npos ? query.size() : amp;
+        if (end > start) {
+            const auto eq = query.find('=', start);
+            if (eq == std::string::npos || eq >= end) {
+                params.emplace_back(query.substr(start, end - start), "");
+            } else {
+                params.emplace_back(query.substr(start, eq - start),
+                                    query.substr(eq + 1, end - eq - 1));
+            }
+        }
+        if (amp == std::string::npos) {
+            break;
+        }
+        start = amp + 1;
+    }
+    return params;
+}
+
 }  // namespace
 
 Request parse_request(const std::string& raw) {
@@ -60,6 +85,7 @@ Request parse_request(const std::string& raw) {
     if (query_pos != std::string::npos) {
         request.query = request.path.substr(query_pos + 1);
         request.path.resize(query_pos);
+        request.query_params = split_query(request.query);
     }
 
     while (std::getline(lines, line)) {

@@ -64,6 +64,13 @@ int main() {
                         "\nuptime_seconds: " + std::to_string(seconds) + "\n";
         return response;
     });
+    router.get("/values", [](const Request& request) {
+        Response response;
+        for (const auto& param : request.query_params) {
+            response.body += param.first + " = " + param.second + "\n";
+        }
+        return response;
+    });
     router.get("/time", [](const Request&) {
         const std::time_t now = std::time(nullptr);
         const char* text = std::ctime(&now);
